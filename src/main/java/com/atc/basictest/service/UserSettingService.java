@@ -78,18 +78,26 @@ public class UserSettingService {
     }
 
     private void validateUserSetting(UserSettingDto userSetting) {
-            String desc = UserSettingsKey.getDescription("widget_order");
-            for (Map<String, String> settingKey : userSetting.getSettingKeys()) {
+        String desc = UserSettingsKey.getDescription("widget_order");
+
+        //I push this code change after 12 PM 14/4/2023 because the bug is bugging my mind.
+        for (Map<String, String> settingKey : userSetting.getSettingKeys()) {
             String widgetOrder = settingKey.get(desc);
             if (widgetOrder != null) {
                 String[] arrOfStr = widgetOrder.split(",");
 
+                int sum = 0;
                 for (String a : arrOfStr) {
-                    if (Integer.parseInt(a) > 5) {
-
+                    int intA = Integer.parseInt(a);
+                    sum += intA;
+                    if (intA > 5 && intA < 1) {
                         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                                 "Invalid value for field Widget Order, rejected value: " + settingKey.values());
                     }
+                }
+                if (sum != 15) {
+                    throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                            "Invalid value for field Widget Order, rejected value: " + settingKey.values());
                 }
             }
         }
