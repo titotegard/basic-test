@@ -44,74 +44,46 @@ public class UserController {
     public ResponseEntity getUsers(
             @RequestParam(value = "max_records", required = false, defaultValue = "5") Integer max_records,
             @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset) {
-        try {
-            Pageable pgb = PageRequest.of(offset, max_records);
-            Page<User> pages = userService.findAll(pgb);
-            return ResponseEntity.ok(HttpPageResponse.ok(pages.getContent(), pgb.getPageSize(), pgb.getPageNumber()));
-        } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
-        }
+        Pageable pgb = PageRequest.of(offset, max_records);
+        Page<User> pages = userService.findAll(pgb);
+        return ResponseEntity.ok(HttpPageResponse.ok(pages.getContent(), pgb.getPageSize(), pgb.getPageNumber()));
     }
 
     @PostMapping
     public ResponseEntity createUser(@RequestBody User user) {
-        try {
-            ResponseDto dto = userService.createUser(user);
-            return ResponseEntity.ok(HttpResponse.ok(dto));
-        } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
-        }
+        ResponseDto dto = userService.createUser(user);
+        return ResponseEntity.ok(HttpResponse.ok(dto));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity getUser(@PathVariable("id") Long id) {
-        try {
-            UserDto userDto = userService.findUserById(id);
-            List<Map<String, String>> settingKeys = userSettingService.findByUserId(id);
-            ResponseDto responseDto = new ResponseDto(userDto, settingKeys);
-            return ResponseEntity.ok(HttpResponse.ok(responseDto));
-        } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
-        }
+        UserDto userDto = userService.findUserById(id);
+        List<Map<String, String>> settingKeys = userSettingService.findByUserId(id);
+        ResponseDto responseDto = new ResponseDto(userDto, settingKeys);
+        return ResponseEntity.ok(HttpResponse.ok(responseDto));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity updateUser(@PathVariable("id") Long id, @RequestBody UserDto req) {
-        try {
-            ResponseDto dto = userService.updateUser(id, req);
-            return ResponseEntity.ok(HttpResponse.ok(dto));
-        } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
-        }
+        ResponseDto dto = userService.updateUser(id, req);
+        return ResponseEntity.ok(HttpResponse.ok(dto));
     }
 
     @PutMapping("/{id}/settings")
     public ResponseEntity updateUserSettings(@PathVariable("id") Long id, @RequestBody UserSettingDto req) {
-        try {
-            ResponseDto dto = userSettingService.updateUserSetting(id, req);
-            return ResponseEntity.ok(HttpResponse.ok(dto));
-        } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
-        }
+        ResponseDto dto = userSettingService.updateUserSetting(id, req);
+        return ResponseEntity.ok(HttpResponse.ok(dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity deleteUser(@PathVariable("id") Long id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
-        }
+        userService.deleteUser(id);
+        return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}/refresh")
     public ResponseEntity refreshUser(@PathVariable("id") Long id) {
-        try {
-            ResponseDto dto = userService.refreshUser(id);
-            return ResponseEntity.ok(HttpResponse.ok(dto));
-        } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
-        }
+        ResponseDto dto = userService.refreshUser(id);
+        return ResponseEntity.ok(HttpResponse.ok(dto));
     }
 }

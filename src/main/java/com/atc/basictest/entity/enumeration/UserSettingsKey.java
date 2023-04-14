@@ -15,10 +15,10 @@ public enum UserSettingsKey {
         this.constraint = constraint;
     }
 
-    public static UserSettingsKey getDescription(String name) {
+    public static String getDescription(String name) {
         for (UserSettingsKey key : values()) {
             if (name.contains(key.name().toLowerCase())) {
-                return key;
+                return key.desc;
             }
         }
         return null;

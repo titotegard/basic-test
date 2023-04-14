@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class HttpResponse<T> implements Serializable {
 
-    public static final int OK = 201;
+    public static final String OK = "201";
     private String status;
-    private int code;
+    private String code;
     private String message;
     @JsonProperty(value = "data")
     @JsonInclude(value = Include.NON_NULL)
@@ -28,7 +28,7 @@ public class HttpResponse<T> implements Serializable {
         return new HttpResponse("SUCCESS", OK, "Success", response);
     }
 
-    public static <T> HttpResponse<T> error(String status, int code, String message) {
+    public static <T> HttpResponse<T> error(String status, String code, String message) {
         return new HttpResponse(status, code, message, null);
     }
 }

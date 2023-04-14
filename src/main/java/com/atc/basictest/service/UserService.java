@@ -1,6 +1,8 @@
 package com.atc.basictest.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +11,10 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.atc.basictest.entity.User;
 import com.atc.basictest.entity.UserSetting;
@@ -37,7 +41,7 @@ public class UserService {
     public UserDto findUserById(Long id) {
         Optional<User> opUser = userRepository.findById(id);
         if (!opUser.isPresent()) {
-            throw new RuntimeException("401");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot find resource with id " + id);
         }
         User user = opUser.get();
         UserDto userDto = setUserDto(user);
@@ -46,10 +50,35 @@ public class UserService {
 
     private void ValidateUser(User user) {
         String ssn = user.getSsn();
+        String firstName = user.getFirstName();
+        String familyName = user.getFamilyName();
+        LocalDate birthDate = user.getBirthDate();
+
         if (ssn.length() < 16) {
             user.setSsn(("0000000000000000" + ssn).substring(ssn.length()));
         } else if (ssn.length() > 16) {
-            throw new RuntimeException("422");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Invalid value for field Ssn, rejected value: " + ssn);
+        }
+
+        if (ssn.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Invalid value for field Ssn, rejected value: " + ssn);
+        }
+
+        if (firstName == null || firstName.length() > 100 || firstName.length() < 3) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Invalid value for field First Name, rejected value: " + firstName);
+        }
+
+        if (familyName == null || familyName.length() > 100 || familyName.length() < 3) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Invalid value for field Family Name, rejected value: " + familyName);
+        }
+
+        if (birthDate == null || ChronoUnit.YEARS.between(birthDate, LocalDate.now()) > 100) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Invalid value for field Birth Date, rejected value: " + birthDate);
         }
     }
 
@@ -66,7 +95,7 @@ public class UserService {
     public ResponseDto updateUser(Long id, UserDto req) {
         Optional<User> opUser = userRepository.findById(id);
         if (!opUser.isPresent()) {
-            throw new RuntimeException("401");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot find resource with id " + id);
         }
 
         User newUser = setNewUser(opUser.get(), req);
@@ -148,7 +177,7 @@ public class UserService {
     public void deleteUser(Long id) {
         Optional<User> opUser = userRepository.findById(id);
         if (!opUser.isPresent()) {
-            throw new RuntimeException("401");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot find resource with id " + id);
         }
 
         userRepository.setActiveAndDeletedTime(id, LocalDateTime.now());
@@ -158,7 +187,7 @@ public class UserService {
     public ResponseDto refreshUser(Long id) {
         Optional<User> opUser = userRepository.findById(id);
         if (!opUser.isPresent()) {
-            throw new RuntimeException("401");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot find resource with id " + id);
         }
         userRepository.setActiveAndDeletedTime(id, true);
         Optional<User> newOpUser = userRepository.findById(id);
